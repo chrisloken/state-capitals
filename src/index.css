@@ -1,0 +1,4 @@
+/* Base resets live in App.css; keep this file minimal for Vite entry. */
+html {
+  height: 100%;
+}
