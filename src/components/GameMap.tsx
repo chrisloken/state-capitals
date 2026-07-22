@@ -38,7 +38,7 @@ export function GameMap({
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/data/states-10m.json")
+    fetch(`${import.meta.env.BASE_URL}data/states-10m.json`)
       .then((r) => r.json())
       .then((topo) => {
         if (cancelled) return;
