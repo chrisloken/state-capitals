@@ -12,6 +12,7 @@ import {
   startGame,
   type GameState,
 } from "./game/logic";
+import { connectedIds, getRoute } from "./data/routes";
 import "./App.css";
 
 function travelDuration(miles: number, backtrack: boolean): number {
@@ -41,13 +42,28 @@ export default function App() {
     return () => clearTimeout(t);
   }, [traveling, progress]);
 
-  const onStart = useCallback(() => setState(startGame()), []);
+  const onStart = useCallback(() => {
+    const params = new URLSearchParams(window.location.search);
+    const start = params.get("start") ?? undefined;
+    setState(startGame(start ?? undefined));
+  }, []);
   const onSelectCity = useCallback((id: string) => {
     setState((s) => beginTravel(s, id));
   }, []);
   const onContinueArrival = useCallback(() => {
     setState((s) => continueAfterArrival(s));
   }, []);
+
+  const choices = useMemo(() => {
+    if (state.phase !== "playing") return [];
+    return connectedIds(state.playerCity)
+      .map((id) => {
+        const city = getCapital(id);
+        const route = getRoute(state.playerCity, id)!;
+        return { id, city, route };
+      })
+      .sort((a, b) => a.city.capital.localeCompare(b.city.capital));
+  }, [state.phase, state.playerCity]);
 
   if (state.phase === "title") {
     return <TitleScreen onStart={onStart} />;
@@ -91,6 +107,27 @@ export default function App() {
           travelTo={state.travel?.to ?? null}
           travelTransport={state.travel?.transport ?? null}
         />
+
+        {selectable && choices.length > 0 && (
+          <div className="choice-bar" aria-label="Connected capitals">
+            <span className="choice-bar-label">Travel to</span>
+            <div className="choice-bar-buttons">
+              {choices.map(({ id, city, route }) => (
+                <button
+                  key={id}
+                  type="button"
+                  className="choice-chip"
+                  onClick={() => onSelectCity(id)}
+                >
+                  <span className="choice-chip-name">{city.capital}</span>
+                  <span className="choice-chip-meta">
+                    {city.abbrev} · {route.transport}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
 
       {state.phase === "arrival" && state.travel && (

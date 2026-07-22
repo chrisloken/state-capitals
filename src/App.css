@@ -361,6 +361,67 @@ button {
   background: transparent;
 }
 
+.map-zoom {
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.choice-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 0.75rem;
+  background: rgba(20, 38, 46, 0.72);
+  color: white;
+  border-radius: 14px;
+  padding: 0.65rem 0.8rem;
+  backdrop-filter: blur(6px);
+}
+
+.choice-bar-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sun);
+  flex-shrink: 0;
+}
+
+.choice-bar-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.choice-chip {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.05rem;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.choice-chip:hover {
+  background: rgba(240, 199, 94, 0.28);
+  transform: translateY(-1px);
+}
+
+.choice-chip-name {
+  font-weight: 800;
+  font-size: 0.95rem;
+  line-height: 1.1;
+}
+
+.choice-chip-meta {
+  font-size: 0.68rem;
+  opacity: 0.8;
+  text-transform: capitalize;
+}
+
 .state {
   fill: url(#land);
   stroke: #5f7f6a;
@@ -402,6 +463,12 @@ button {
   to {
     stroke-dashoffset: -20;
   }
+}
+
+.capital-hit {
+  fill: transparent;
+  stroke: none;
+  pointer-events: all;
 }
 
 .capital-dot {
@@ -447,11 +514,19 @@ button {
   font-weight: 800;
   fill: var(--ink);
   font-family: "Nunito", sans-serif;
+  pointer-events: none;
 }
 
 .capital-label-bg {
-  fill: rgba(255, 255, 255, 0.92);
-  stroke: rgba(20, 38, 46, 0.12);
+  fill: rgba(255, 255, 255, 0.96);
+  stroke: rgba(20, 38, 46, 0.16);
+  stroke-width: 1;
+}
+
+.capital-label-stem {
+  stroke: rgba(20, 38, 46, 0.35);
+  stroke-width: 1;
+  pointer-events: none;
 }
 
 .capital-choice:focus {

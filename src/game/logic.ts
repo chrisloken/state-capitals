@@ -63,10 +63,14 @@ export function createInitialState(): GameState {
   };
 }
 
-export function startGame(): GameState {
+export function startGame(preferredStart?: string): GameState {
   // Start somewhere with several connections (skip AK/HI as start).
   const starters = capitals.filter((c) => connectedIds(c.id).length >= 3);
-  const start = randomOf(starters.length ? starters : capitals);
+  const forced = preferredStart
+    ? capitals.find((c) => c.id === preferredStart)
+    : undefined;
+  const start =
+    forced ?? randomOf(starters.length ? starters : capitals);
   const target = chooseSpyTarget(start.id);
   return {
     phase: "playing",
