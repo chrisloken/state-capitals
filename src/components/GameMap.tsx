@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { geoAlbersUsa, geoPath, type GeoPermissibleObjects } from "d3-geo";
 import { feature } from "topojson-client";
 import type { FeatureCollection, Geometry } from "geojson";
+import type { Topology, GeometryCollection } from "topojson-specification";
 import { capitals, capitalByFips, type Capital } from "../data/capitals";
 import { allUniqueRoutes, connectedIds, type Transport } from "../data/routes";
+import statesTopo from "../data/states-10m.json";
 
 type Props = {
   playerCity: string;
@@ -20,6 +22,15 @@ type Props = {
 const WIDTH = 975;
 const HEIGHT = 610;
 
+type StatesTopology = Topology<{ states: GeometryCollection }>;
+
+function buildStatesCollection(): FeatureCollection<Geometry> {
+  const topo = statesTopo as unknown as StatesTopology;
+  return feature(topo, topo.objects.states) as FeatureCollection<Geometry>;
+}
+
+const STATES = buildStatesCollection();
+
 export function GameMap({
   playerCity,
   spyTarget,
@@ -31,30 +42,8 @@ export function GameMap({
   travelTo,
   travelTransport,
 }: Props) {
-  const [states, setStates] = useState<FeatureCollection<Geometry> | null>(
-    null,
-  );
   const [hoverId, setHoverId] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch(`${import.meta.env.BASE_URL}data/states-10m.json`)
-      .then((r) => r.json())
-      .then((topo) => {
-        if (cancelled) return;
-        const fc = feature(
-          topo,
-          // oxlint-disable-next-line typescript/no-explicit-any
-          (topo as { objects: { states: object } }).objects.states as never,
-        ) as unknown as FeatureCollection;
-        setStates(fc);
-      })
-      .catch(console.error);
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
+  const states = STATES;
   const projection = useMemo(
     () => geoAlbersUsa().translate([WIDTH / 2, HEIGHT / 2]).scale(1300),
     [],
@@ -103,14 +92,6 @@ export function GameMap({
       (180 / Math.PI);
     return { x, y, angle };
   }, [travelProgress, travelFrom, travelTo, positions]);
-
-  if (!states) {
-    return (
-      <div className="map-loading" role="status">
-        Unfolding the map…
-      </div>
-    );
-  }
 
   return (
     <svg
